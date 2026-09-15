@@ -1,0 +1,7 @@
+{
+  "name": "bon-elashry-scratch",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^10.0.0"
+  }
+}
