@@ -66,9 +66,7 @@ export const handler = async (event) => {
     const result = await store.set(
       key,
       JSON.stringify(record),
-      {
-        onlyIfNew: true
-      }
+      { onlyIfNew: true }
     );
 
     if (!result.modified) {
