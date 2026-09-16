@@ -1,4 +1,3 @@
-
 import { getStore } from "@netlify/blobs";
 
 const PRIZES = [
@@ -42,11 +41,7 @@ export const handler = async (event) => {
       };
     }
 
-    const store = getStore({
-      name: "ashry-scratch-cards",
-      consistency: "strong"
-    });
-
+    const store = getStore("ashry-scratch-cards");
     const key = `code:${code}`;
 
     const existing = await store.get(key, {
@@ -71,7 +66,9 @@ export const handler = async (event) => {
     const result = await store.set(
       key,
       JSON.stringify(record),
-      { onlyIfNew: true }
+      {
+        onlyIfNew: true
+      }
     );
 
     if (!result.modified) {
