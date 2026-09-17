@@ -1,8 +1,8 @@
-<!doctype html>
+doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>بن العشري | هديتك</title>
+<title>بن العشهديتك</title>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#3a2414,#100b08 65%);font-family:Arial,sans-serif;color:#fff;display:flex;justify-content:center;align-items:center;padding:18px}
 .box{width:min(430px,100%);background:#17100cdd;border:1px solid #9d7432;border-radius:26px;padding:25px 17px;box-shadow:0 20px 70px #0009;text-align:center}
@@ -17,36 +17,4 @@ h1{font-size:27px;margin:8px 0}.sub{color:#ddd;margin-bottom:15px}
 #code{color:#999;font-size:12px;margin-top:12px}
 </style></head>
 <body>
-<div class="box">
-  <div class="logo">☕ بن العشري</div>
-  <div class="line"></div>
-  <h1>🎁 عندك هدية مستخبية!</h1>
-  <div class="sub">اخربش بإيدك وشوف كسبت إيه</div>
-  <div class="scratch">
-    <div id="prize"><div>🎉 مبروك!</div><div class="big">جاري تحديد الجائزة...</div><div class="small">بن العشري دايمًا معاك ❤️</div></div>
-    <canvas id="canvas"></canvas>
-  </div>
-  <div class="note">👆 حرّك صباعك على المربع لحد ما تظهر الجائزة</div>
-  <div id="code"></div>
-</div>
-<script>
-const prizes = ["خصم 10% 🎉", "كوب قهوة مجانًا ☕", "خصم 20 جنيه 🎁", "كيس بن مجانًا 🫘", "حاول مرة تانية 😄"];
-const params = new URLSearchParams(location.search);
-const code = params.get("code") || "DEMO";
-let hash=0; for(const ch of code) hash=(hash*31+ch.charCodeAt(0))>>>0;
-const prize=prizes[hash%prizes.length];
-document.querySelector("#prize .big").textContent=prize;
-document.getElementById("code").textContent="كود التجربة: "+code;
-
-const c=document.getElementById("canvas"),ctx=c.getContext("2d");
-function resize(){
- const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
- ctx.globalCompositeOperation="source-over";ctx.fillStyle="#777";ctx.fillRect(0,0,r.width,r.height);
- ctx.fillStyle="#eee";ctx.font="bold 23px Arial";ctx.textAlign="center";ctx.fillText("اخربش هنا 🎁",r.width/2,r.height/2);
-}
-resize();addEventListener("resize",resize);
-let down=false;
-function p(e){const r=c.getBoundingClientRect(),x=e.clientX??e.touches[0].clientX,y=e.clientY??e.touches[0].clientY;return{x:x-r.left,y:y-r.top}}
-function scratch(e){if(!down)return;e.preventDefault();const q=p(e);ctx.globalCompositeOperation="destination-out";ctx.beginPath();ctx.arc(q.x,q.y,25,0,Math.PI*2);ctx.fill()}
-c.onpointerdown=e=>{down=true;scratch(e)};c.onpointermove=scratch;c.onpointerup=()=>down=false;c.onpointercancel=()=>down=false;
-</script></body></html>
+<div 
