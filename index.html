@@ -1,20 +1,460 @@
-doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>بن العشهديتك</title>
-<style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#3a2414,#100b08 65%);font-family:Arial,sans-serif;color:#fff;display:flex;justify-content:center;align-items:center;padding:18px}
-.box{width:min(430px,100%);background:#17100cdd;border:1px solid #9d7432;border-radius:26px;padding:25px 17px;box-shadow:0 20px 70px #0009;text-align:center}
-.logo{font-size:30px;font-weight:900;color:#efc65d}.line{height:1px;background:#795928;margin:13px 0 18px}
-h1{font-size:27px;margin:8px 0}.sub{color:#ddd;margin-bottom:15px}
-.scratch{position:relative;height:235px;border-radius:19px;overflow:hidden;background:#f7e0a0;border:2px solid #c99b45;touch-action:none}
-#prize{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#24170f;padding:15px}
-#prize .big{font-size:36px;font-weight:900;margin:8px 0}
-#prize .small{font-size:18px}
-#canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-.note{margin:15px 0 0;color:#e8c875;font-size:15px}
-#code{color:#999;font-size:12px;margin-top:12px}
-</style></head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بن العشري | هديتك</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #3a2414, #100b08 65%);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+    }
+
+    .box {
+      width: min(430px, 100%);
+      background: #17100c;
+      border: 1px solid #9d7432;
+      border-radius: 26px;
+      padding: 25px 17px;
+      box-shadow: 0 20px 70px #0009;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 30px;
+      font-weight: 900;
+      color: #efc65d;
+    }
+
+    .line {
+      height: 1px;
+      background: #795928;
+      margin: 13px 0 18px;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 8px 0;
+    }
+
+    .sub {
+      color: #ddd;
+      margin-bottom: 15px;
+      line-height: 1.7;
+    }
+
+    .scratch {
+      position: relative;
+      height: 235px;
+      border-radius: 19px;
+      overflow: hidden;
+      background: #f7e0a0;
+      border: 2px solid #c99b45;
+      touch-action: none;
+    }
+
+    #prize {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #24170f;
+      padding: 15px;
+      text-align: center;
+    }
+
+    #prize .big {
+      font-size: 36px;
+      font-weight: 900;
+      margin: 8px 0;
+    }
+
+    #prize .small {
+      font-size: 18px;
+    }
+
+    #canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .note {
+      margin: 15px 0 0;
+      color: #e8c875;
+      font-size: 15px;
+    }
+
+    #status {
+      margin-top: 12px;
+      min-height: 25px;
+      font-weight: bold;
+    }
+
+    #code {
+      color: #999;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
 <body>
-<div 
+
+  <div class="box">
+
+    <div class="logo">☕ بن العشري</div>
+
+    <div class="line"></div>
+
+    <h1>🎁 عندك هدية مستخبية!</h1>
+
+    <div class="sub">
+      اخربش بإيدك وشوف كسبت إيه ❤️
+    </div>
+
+    <div class="scratch">
+      <div id="prize">
+        <div class="big">جاري تجهيز الهدية...</div>
+        <div class="small">استنى شوية</div>
+      </div>
+
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="note">
+      👆 حرّك صباعك على المربع لحد ما تظهر الجائزة
+    </div>
+
+    <div id="code"></div>
+
+  </div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const code = (params.get("code") || "")
+  .trim()
+  .toUpperCase();
+
+const prize = document.getElementById("prize");
+const status = document.getElementById("status");
+const codeText = document.getElementById("code");
+const canvas = document.getElementById("canvas");
+
+let ctx = null;
+let scratchingEnabled = false;
+let isDrawing = false;
+let revealed = false;
+
+codeText.textContent = code
+  ? "كود الكارت: " + code
+  : "";
+
+
+async function claimCard() {
+
+  if (!code) {
+
+    prize.innerHTML =
+      '<div class="big">افتح الكارت من QR</div>';
+
+    status.textContent =
+      "⚠️ مفيش كود للكارت";
+
+    return;
+  }
+
+  status.textContent =
+    "جاري تجهيز هديتك...";
+
+  try {
+
+    const response = await fetch(
+      "/.netlify/functions/claim",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          code: code
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    /*
+      لو الكارت مستخدم قبل كده
+    */
+    if (response.status === 409) {
+
+      prize.innerHTML =
+        '<div class="big">❤️ الكارت اتستخدم</div>' +
+        '<div class="small">الكارت ده اتستخدم قبل كده</div>';
+
+      status.textContent =
+        "مينفعش استخدام نفس الكارت مرتين";
+
+      canvas.style.display = "none";
+
+      return;
+    }
+
+    /*
+      أي خطأ آخر
+    */
+    if (!response.ok) {
+
+      prize.innerHTML =
+        '<div class="big">⚠️ الكود غير صالح</div>';
+
+      status.textContent =
+        data.message || "حصل خطأ";
+
+      canvas.style.display = "none";
+
+      return;
+    }
+
+    /*
+      الجائزة صحيحة
+    */
+
+    prize.innerHTML =
+      '<div class="big">🎁 هديتك جاهزة!</div>' +
+      '<div class="small">اخربش المربع وشوف الجائزة</div>';
+
+    setupScratch(data.prize);
+
+    scratchingEnabled = true;
+
+    status.textContent =
+      "🎉 مبروك! اخربش وشوف هديتك";
+
+  } catch (error) {
+
+    prize.innerHTML =
+      '<div class="big">⚠️ حصل عطل</div>';
+
+    status.textContent =
+      "جرّب تاني بعد شوية";
+
+    canvas.style.display = "none";
+  }
+}
+
+
+function setupScratch(realPrize) {
+
+  const rect = canvas.getBoundingClientRect();
+
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  ctx = canvas.getContext("2d");
+
+  /*
+    نكتب الجائزة الحقيقية تحت طبقة الخدش
+  */
+
+  prize.innerHTML =
+    '<div class="big">' +
+    realPrize +
+    '</div>' +
+    '<div class="small">❤️ بن العشري</div>';
+
+  /*
+    طبقة الخدش
+  */
+
+  ctx.globalCompositeOperation = "source-over";
+
+  ctx.fillStyle = "#b8b8b8";
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  ctx.fillStyle = "#666";
+
+  ctx.font = "bold 25px Arial";
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText(
+    "اخربش هنا 👆",
+    canvas.width / 2,
+    canvas.height / 2
+  );
+}
+
+
+function scratch(x, y) {
+
+  if (!scratchingEnabled || !ctx || revealed) {
+    return;
+  }
+
+  ctx.globalCompositeOperation =
+    "destination-out";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y,
+    30,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  checkProgress();
+}
+
+
+function getPosition(e) {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+
+
+canvas.addEventListener(
+  "pointerdown",
+  function(e) {
+
+    if (!scratchingEnabled) return;
+
+    isDrawing = true;
+
+    canvas.setPointerCapture(e.pointerId);
+
+    const pos = getPosition(e);
+
+    scratch(pos.x, pos.y);
+  }
+);
+
+
+canvas.addEventListener(
+  "pointermove",
+  function(e) {
+
+    if (!isDrawing) return;
+
+    const pos = getPosition(e);
+
+    scratch(pos.x, pos.y);
+  }
+);
+
+
+canvas.addEventListener(
+  "pointerup",
+  function() {
+
+    isDrawing = false;
+  }
+);
+
+
+canvas.addEventListener(
+  "pointercancel",
+  function() {
+
+    isDrawing = false;
+  }
+);
+
+
+function checkProgress() {
+
+  if (!ctx) return;
+
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+  let transparent = 0;
+
+  /*
+    بنفحص جزء من البكسلات
+  */
+
+  for (
+    let i = 3;
+    i < imageData.data.length;
+    i += 16
+  ) {
+
+    if (imageData.data[i] === 0) {
+      transparent++;
+    }
+  }
+
+  const total =
+    imageData.data.length / 16;
+
+  const percent =
+    transparent / total;
+
+  if (percent > 0.55) {
+
+    revealed = true;
+
+    canvas.style.pointerEvents =
+      "none";
+
+    status.textContent =
+      "🎉 مبروك! هديتك ظهرت ❤️";
+  }
+}
+
+
+/*
+  تشغيل الكارت
+*/
+
+claimCard();
+
+</script>
+
+</body>
+</html>
